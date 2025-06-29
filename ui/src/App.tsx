@@ -17,14 +17,16 @@ const NAVIGATION: Navigation = [
 ]
 
 const BRANDING: Branding = {
-  title: 'Postgres with OrioleDB',
+  title: 'Postgres by Supabase',
 }
 
 function QueryPage() {
   const [queryResult, setQueryResult] = React.useState<any[]>([])
   const [queryError, setQueryError] = React.useState<string>('')
   const [columns, setColumns] = React.useState<GridColDef[]>([])
-  const [query, setQuery] = React.useState<string>('SELECT version();')
+  const [query, setQuery] = React.useState<string>(
+    'select * from pg_available_extensions;'
+  )
 
   const executeQuery = async () => {
     console.log('Executing query:', query)
@@ -88,9 +90,81 @@ function QueryPage() {
         height: '100vh',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
       }}
     >
-      <Stack spacing={0} sx={{ flex: '0 0 auto' }}>
+      <Box sx={{ flex: '1 1 auto', minHeight: 0 }}>
+        {queryResult.length > 0 ? (
+          <DataGrid
+            rows={queryResult}
+            columns={columns}
+            pageSizeOptions={[5, 10, 25]}
+            disableRowSelectionOnClick
+            disableColumnMenu
+            sx={{
+              height: '100%',
+              border: 'none',
+              fontFamily: '"IBM Plex Mono", monospace',
+              '& .MuiDataGrid-main': {
+                border: 'none',
+              },
+              '& .MuiDataGrid-cell': {
+                fontFamily: '"IBM Plex Mono", monospace',
+              },
+              '& .MuiDataGrid-columnHeader': {
+                fontFamily: '"IBM Plex Mono", monospace',
+              },
+              '& .MuiDataGrid-columnHeaders': {
+                fontFamily: '"IBM Plex Mono", monospace',
+              },
+              '& .MuiDataGrid-footerContainer': {
+                fontFamily: '"IBM Plex Mono", monospace',
+              },
+            }}
+          />
+        ) : (
+          <Box 
+            sx={{ 
+              height: '100%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              color: 'text.secondary',
+              fontFamily: '"IBM Plex Sans"'
+            }}
+          >
+            <Typography variant="h6" sx={{ fontFamily: '"IBM Plex Sans"' }}>
+              Run a query to see results
+            </Typography>
+          </Box>
+        )}
+      </Box>
+
+      <Stack 
+        spacing={0} 
+        sx={{ 
+          flex: '0 0 auto',
+          position: 'sticky',
+          bottom: 0,
+          backgroundColor: 'background.default',
+          zIndex: 1000
+        }}
+      >
+        {queryError && (
+          <Alert
+            severity="error"
+            sx={{
+              fontFamily: '"IBM Plex Mono", monospace',
+              mx: 1,
+              mb: 2,
+            }}
+          >
+            {queryError}
+          </Alert>
+        )}
+
+        <Divider />
+
         <TextField
           multiline
           minRows={2}
@@ -131,51 +205,11 @@ function QueryPage() {
         <Button
           variant="contained"
           onClick={executeQuery}
-          sx={{ mx: 1 }}
+          sx={{ borderRadius: 0, py: 1.5 }}
         >
           Execute Query
         </Button>
-
-        {queryError && (
-          <Alert 
-            severity="error" 
-            sx={{ 
-              fontFamily: '"IBM Plex Mono", monospace',
-              mx: 1,
-              mt: 2
-            }}
-          >
-            {queryError}
-          </Alert>
-        )}
       </Stack>
-
-      {queryResult.length > 0 && (
-        <>
-          <Divider sx={{ mt: 2 }} />
-          <Box sx={{ flex: '1 1 auto' }}>
-            <DataGrid
-              rows={queryResult}
-              columns={columns}
-              pageSizeOptions={[5, 10, 25]}
-              disableRowSelectionOnClick
-              sx={{
-                border: 'none',
-                fontFamily: '"IBM Plex Mono", monospace',
-                '& .MuiDataGrid-main': {
-                  border: 'none',
-                },
-                '& .MuiDataGrid-cell': {
-                  fontFamily: '"IBM Plex Mono", monospace',
-                },
-                '& .MuiDataGrid-columnHeader': {
-                  fontFamily: '"IBM Plex Mono", monospace',
-                },
-              }}
-            />
-          </Box>
-        </>
-      )}
     </Box>
   )
 }
