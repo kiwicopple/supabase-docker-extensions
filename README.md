@@ -24,24 +24,48 @@ make install-extension
 3. Execute SQL queries using the query interface
 4. View results in the response area
 
-## Debugging
+## Development
+
+### Hot Reloading
+
+During UI development, you can use hot reloading to test changes without rebuilding the entire extension:
+
+1. Start the development server:
+```shell
+cd ui
+npm run dev
+```
+
+2. Configure Docker Desktop to use the development server:
+```shell
+docker extension dev ui-source orioledb-docker-extension http://localhost:5173
+```
+
+3. Close and reopen Docker Desktop dashboard to see your changes instantly
+
+4. When finished, reset the extension configuration:
+```shell
+docker extension dev reset orioledb-docker-extension
+```
+
+### Debugging
 
 To enable Chrome Dev Tools for debugging the extension UI:
 
 ```shell
-docker extension dev debug orioledb-docker-extension:1.0
+docker extension dev debug orioledb-docker-extension
 ```
 
 Each subsequent click on the extension tab will open Chrome Dev Tools. This allows you to:
 - View console errors and logs
 - Inspect React components and state
-- Monitor network requests to the backend
+- Monitor network requests to postgres-meta
 - Debug styling and layout issues
 
 To disable debugging mode:
 
 ```shell
-docker extension dev reset orioledb-docker-extension:1.0
+docker extension dev reset orioledb-docker-extension
 ```
 
 ## About OrioleDB
