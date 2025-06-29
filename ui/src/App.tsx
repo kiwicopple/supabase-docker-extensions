@@ -24,7 +24,7 @@ function QueryPage() {
   const [queryResult, setQueryResult] = React.useState<any[]>([])
   const [queryError, setQueryError] = React.useState<string>('')
   const [columns, setColumns] = React.useState<GridColDef[]>([])
-  const [query, setQuery] = React.useState<string>('SELECT version()')
+  const [query, setQuery] = React.useState<string>('SELECT version();')
 
   const executeQuery = async () => {
     console.log('Executing query:', query)
@@ -83,38 +83,73 @@ function QueryPage() {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Stack spacing={3}>
-        <Box>
-          <Stack spacing={2}>
-            <TextField
-              label="SQL Query"
-              multiline
-              rows={3}
-              fullWidth
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Enter your SQL query here..."
-            />
-            <Button variant="contained" onClick={executeQuery}>
-              Execute Query
-            </Button>
+    <Box
+      sx={{
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Stack spacing={0} sx={{ flex: '0 0 auto' }}>
+        <TextField
+          multiline
+          minRows={2}
+          maxRows={10}
+          fullWidth
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+              e.preventDefault()
+              executeQuery()
+            }
+          }}
+          placeholder="Enter your SQL query here... (Cmd/Ctrl + Enter to execute)"
+          variant="outlined"
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                border: 'none',
+              },
+              '&:hover fieldset': {
+                border: 'none',
+              },
+              '&.Mui-focused fieldset': {
+                border: 'none',
+              },
+            },
+          }}
+        />
+        <Button 
+          variant="contained" 
+          onClick={executeQuery}
+          sx={{ borderRadius: 0 }}
+        >
+          Execute Query
+        </Button>
 
-            {queryError && <Alert severity="error">{queryError}</Alert>}
-
-            {queryResult.length > 0 && (
-              <Box sx={{ height: 400, width: '100%' }}>
-                <DataGrid
-                  rows={queryResult}
-                  columns={columns}
-                  pageSizeOptions={[5, 10, 25]}
-                  disableRowSelectionOnClick
-                />
-              </Box>
-            )}
-          </Stack>
-        </Box>
+        {queryError && <Alert severity="error">{queryError}</Alert>}
       </Stack>
+
+      {queryResult.length > 0 && (
+        <>
+          <Divider sx={{ mt: 2 }} />
+          <Box sx={{ flex: '1 1 auto' }}>
+            <DataGrid
+              rows={queryResult}
+              columns={columns}
+              pageSizeOptions={[5, 10, 25]}
+              disableRowSelectionOnClick
+              sx={{
+                border: 'none',
+                '& .MuiDataGrid-main': {
+                  border: 'none',
+                },
+              }}
+            />
+          </Box>
+        </>
+      )}
     </Box>
   )
 }
