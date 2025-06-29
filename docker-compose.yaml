@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+  orioledb:
+    image: orioledb/orioledb:beta11-pg17-ubuntu
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - collabnet
+
+  postgres-meta:
+    image: supabase/postgres-meta:v0.89.3
+    depends_on:
+      - orioledb
+    restart: always
+    environment:
+      - PG_META_PORT=8080
+      - PG_META_DB_HOST=orioledb
+      - PG_META_DB_PORT=5432
+      - PG_META_DB_NAME=postgres
+      - PG_META_DB_USER=postgres
+      - PG_META_DB_PASSWORD=postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - collabnet
+
+networks:
+  collabnet:
