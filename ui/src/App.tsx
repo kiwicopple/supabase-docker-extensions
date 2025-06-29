@@ -1,12 +1,18 @@
 import React from 'react'
 import Button from '@mui/material/Button'
-import { Stack, TextField, Typography, Box, Alert } from '@mui/material'
+import {
+  Stack,
+  TextField,
+  Typography,
+  Box,
+  Alert,
+  Divider,
+} from '@mui/material'
 import { Dataset as DatabaseIcon } from '@mui/icons-material'
 import { DashboardLayout } from '@toolpad/core/DashboardLayout'
 import { AppProvider } from '@toolpad/core/AppProvider'
 import type { Navigation, Branding } from '@toolpad/core'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import Divider from '@mui/material/Divider'
 
 const NAVIGATION: Navigation = [
   {
@@ -24,6 +30,8 @@ function QueryPage() {
   const [queryResult, setQueryResult] = React.useState<any[]>([])
   const [queryError, setQueryError] = React.useState<string>('')
   const [columns, setColumns] = React.useState<GridColDef[]>([])
+
+  // Keep this query as a constant for now.
   const [query, setQuery] = React.useState<string>(
     'select * from pg_available_extensions;'
   )
@@ -123,31 +131,28 @@ function QueryPage() {
             }}
           />
         ) : (
-          <Box 
-            sx={{ 
-              height: '100%', 
-              display: 'flex', 
-              alignItems: 'center', 
+          <Box
+            sx={{
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'center',
               color: 'text.secondary',
-              fontFamily: '"IBM Plex Sans"'
             }}
           >
-            <Typography variant="h6" sx={{ fontFamily: '"IBM Plex Sans"' }}>
-              Run a query to see results
-            </Typography>
+            <Typography variant="h6">Run a query to see results.</Typography>
           </Box>
         )}
       </Box>
 
-      <Stack 
-        spacing={0} 
-        sx={{ 
+      <Stack
+        spacing={0}
+        sx={{
           flex: '0 0 auto',
           position: 'sticky',
           bottom: 0,
           backgroundColor: 'background.default',
-          zIndex: 1000
+          zIndex: 1000,
         }}
       >
         {queryError && (
