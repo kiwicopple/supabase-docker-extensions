@@ -1,67 +1,55 @@
-import React from "react";
-import Button from "@mui/material/Button";
-import { createDockerDesktopClient } from "@docker/extension-api-client";
-import {
-  Stack,
-  TextField,
-  Typography,
-  Box,
-} from "@mui/material";
-import { OpenInNew as OpenInNewIcon } from "@mui/icons-material";
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { AppProvider } from '@toolpad/core/AppProvider';
-import type { Navigation, Branding } from '@toolpad/core';
-
-const client = createDockerDesktopClient();
-
-function useDockerDesktopClient() {
-  return client;
-}
+import React from 'react'
+import Button from '@mui/material/Button'
+import { Stack, TextField, Typography, Box } from '@mui/material'
+import { Dataset as DatabaseIcon } from '@mui/icons-material'
+import { DashboardLayout } from '@toolpad/core/DashboardLayout'
+import { AppProvider } from '@toolpad/core/AppProvider'
+import type { Navigation, Branding } from '@toolpad/core'
 
 const NAVIGATION: Navigation = [
   {
     segment: 'queries',
     title: 'SQL Queries',
-    icon: <OpenInNewIcon />,
+    icon: <DatabaseIcon />,
   },
-];
+]
 
 const BRANDING: Branding = {
   title: 'OrioleDB Management',
-};
+}
 
 function QueryPage() {
-  const [queryResult, setQueryResult] = React.useState<string>("");
-  const [query, setQuery] = React.useState<string>("SELECT version();");
+  const [queryResult, setQueryResult] = React.useState<string>('')
+  const [query, setQuery] = React.useState<string>('SELECT version()')
 
   const executeQuery = async () => {
-    console.log("Executing query:", query);
+    console.log('Executing query:', query)
     try {
-      const response = await fetch("http://localhost:8080/query", {
-        method: "POST",
+      const response = await fetch('http://localhost:8080/query', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ query }),
-      });
+      })
 
       if (response.ok) {
-        const data = await response.json();
-        console.log("Query result:", data);
-        setQueryResult(JSON.stringify(data, null, 2));
+        const data = await response.json()
+        console.log('Query result:', data)
+        setQueryResult(JSON.stringify(data, null, 2))
       } else {
-        const errorText = await response.text();
+        const errorText = await response.text()
         throw new Error(
           `Query failed with status ${response.status}: ${errorText}`
-        );
+        )
       }
     } catch (error) {
-      console.error("Query execution failed:", error);
+      console.error('Query execution failed:', error)
       const errorMessage =
-        error instanceof Error ? error.message : JSON.stringify(error);
-      setQueryResult(`Error: ${errorMessage}`);
+        error instanceof Error ? error.message : JSON.stringify(error)
+      setQueryResult(`Error: ${errorMessage}`)
     }
-  };
+  }
 
   return (
     <Box sx={{ p: 3 }}>
@@ -100,7 +88,7 @@ function QueryPage() {
         </Box>
       </Stack>
     </Box>
-  );
+  )
 }
 
 export function App() {
@@ -110,5 +98,5 @@ export function App() {
         <QueryPage />
       </DashboardLayout>
     </AppProvider>
-  );
+  )
 }
