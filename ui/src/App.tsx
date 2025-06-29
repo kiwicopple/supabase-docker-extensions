@@ -17,7 +17,7 @@ const NAVIGATION: Navigation = [
 ]
 
 const BRANDING: Branding = {
-  title: 'OrioleDB Management',
+  title: 'Postgres with OrioleDB',
 }
 
 function QueryPage() {
@@ -107,7 +107,9 @@ function QueryPage() {
           placeholder="Enter your SQL query here... (Cmd/Ctrl + Enter to execute)"
           variant="outlined"
           sx={{
+            fontFamily: '"IBM Plex Mono", monospace !important',
             '& .MuiOutlinedInput-root': {
+              fontFamily: '"IBM Plex Mono", monospace !important',
               '& fieldset': {
                 border: 'none',
               },
@@ -118,17 +120,34 @@ function QueryPage() {
                 border: 'none',
               },
             },
+            '& .MuiInputBase-input': {
+              fontFamily: '"IBM Plex Mono", monospace !important',
+            },
+            '& textarea': {
+              fontFamily: '"IBM Plex Mono", monospace !important',
+            },
           }}
         />
-        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           onClick={executeQuery}
-          sx={{ borderRadius: 0 }}
+          sx={{ mx: 1 }}
         >
           Execute Query
         </Button>
 
-        {queryError && <Alert severity="error">{queryError}</Alert>}
+        {queryError && (
+          <Alert 
+            severity="error" 
+            sx={{ 
+              fontFamily: '"IBM Plex Mono", monospace',
+              mx: 1,
+              mt: 2
+            }}
+          >
+            {queryError}
+          </Alert>
+        )}
       </Stack>
 
       {queryResult.length > 0 && (
@@ -142,8 +161,15 @@ function QueryPage() {
               disableRowSelectionOnClick
               sx={{
                 border: 'none',
+                fontFamily: '"IBM Plex Mono", monospace',
                 '& .MuiDataGrid-main': {
                   border: 'none',
+                },
+                '& .MuiDataGrid-cell': {
+                  fontFamily: '"IBM Plex Mono", monospace',
+                },
+                '& .MuiDataGrid-columnHeader': {
+                  fontFamily: '"IBM Plex Mono", monospace',
                 },
               }}
             />
@@ -156,8 +182,20 @@ function QueryPage() {
 
 export function App() {
   return (
-    <AppProvider navigation={NAVIGATION} branding={BRANDING}>
-      <DashboardLayout>
+    <AppProvider branding={BRANDING}>
+      <DashboardLayout
+        disableCollapsibleSidebar
+        hideNavigation
+        sx={{
+          '& .MuiDrawer-root': {
+            display: 'none',
+          },
+          '& .MuiAppBar-root a': {
+            pointerEvents: 'none',
+            cursor: 'default',
+          },
+        }}
+      >
         <QueryPage />
       </DashboardLayout>
     </AppProvider>

@@ -1,15 +1,21 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import CssBaseline from '@mui/material/CssBaseline'
-import { DockerMuiV5ThemeProvider } from '@docker/docker-mui-theme'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
 
 import { App } from './App'
 
+const theme = createTheme({
+  typography: {
+    fontFamily: '"IBM Plex Sans", "Helvetica", "Arial", sans-serif',
+  },
+})
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <DockerMuiV5ThemeProvider>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <App />
-    </DockerMuiV5ThemeProvider>
+    </ThemeProvider>
   </React.StrictMode>
 )
