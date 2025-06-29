@@ -1,10 +1,12 @@
 import React from 'react'
 import Button from '@mui/material/Button'
-import { Stack, TextField, Typography, Box } from '@mui/material'
+import { Stack, TextField, Typography, Box, Alert } from '@mui/material'
 import { Dataset as DatabaseIcon } from '@mui/icons-material'
 import { DashboardLayout } from '@toolpad/core/DashboardLayout'
 import { AppProvider } from '@toolpad/core/AppProvider'
 import type { Navigation, Branding } from '@toolpad/core'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import Divider from '@mui/material/Divider'
 
 const NAVIGATION: Navigation = [
   {
@@ -19,11 +21,17 @@ const BRANDING: Branding = {
 }
 
 function QueryPage() {
-  const [queryResult, setQueryResult] = React.useState<string>('')
+  const [queryResult, setQueryResult] = React.useState<any[]>([])
+  const [queryError, setQueryError] = React.useState<string>('')
+  const [columns, setColumns] = React.useState<GridColDef[]>([])
   const [query, setQuery] = React.useState<string>('SELECT version()')
 
   const executeQuery = async () => {
     console.log('Executing query:', query)
+    setQueryError('')
+    setQueryResult([])
+    setColumns([])
+
     try {
       const response = await fetch('http://localhost:8080/query', {
         method: 'POST',
@@ -36,7 +44,30 @@ function QueryPage() {
       if (response.ok) {
         const data = await response.json()
         console.log('Query result:', data)
-        setQueryResult(JSON.stringify(data, null, 2))
+
+        if (Array.isArray(data) && data.length > 0) {
+          // Generate columns from the first row
+          const firstRow = data[0]
+          const generatedColumns: GridColDef[] = Object.keys(firstRow).map(
+            (key) => ({
+              field: key,
+              headerName: key.charAt(0).toUpperCase() + key.slice(1),
+              width: 150,
+              flex: 1,
+            })
+          )
+
+          // Add row IDs for DataGrid
+          const rowsWithIds = data.map((row, index) => ({
+            id: row.id || index,
+            ...row,
+          }))
+
+          setColumns(generatedColumns)
+          setQueryResult(rowsWithIds)
+        } else {
+          setQueryError('No data returned from query')
+        }
       } else {
         const errorText = await response.text()
         throw new Error(
@@ -47,21 +78,14 @@ function QueryPage() {
       console.error('Query execution failed:', error)
       const errorMessage =
         error instanceof Error ? error.message : JSON.stringify(error)
-      setQueryResult(`Error: ${errorMessage}`)
+      setQueryError(errorMessage)
     }
   }
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        Manage your OrioleDB instance with this simple interface.
-      </Typography>
-
       <Stack spacing={3}>
         <Box>
-          <Typography variant="h6" gutterBottom>
-            Execute Query
-          </Typography>
           <Stack spacing={2}>
             <TextField
               label="SQL Query"
@@ -75,15 +99,19 @@ function QueryPage() {
             <Button variant="contained" onClick={executeQuery}>
               Execute Query
             </Button>
-            <TextField
-              label="Query Result"
-              multiline
-              rows={8}
-              fullWidth
-              value={queryResult}
-              disabled
-              variant="outlined"
-            />
+
+            {queryError && <Alert severity="error">{queryError}</Alert>}
+
+            {queryResult.length > 0 && (
+              <Box sx={{ height: 400, width: '100%' }}>
+                <DataGrid
+                  rows={queryResult}
+                  columns={columns}
+                  pageSizeOptions={[5, 10, 25]}
+                  disableRowSelectionOnClick
+                />
+              </Box>
+            )}
           </Stack>
         </Box>
       </Stack>
