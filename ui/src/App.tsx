@@ -6,12 +6,11 @@ import {
   TextField,
   Typography,
   Box,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Link,
 } from "@mui/material";
 import { OpenInNew as OpenInNewIcon } from "@mui/icons-material";
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import type { Navigation, Branding } from '@toolpad/core';
 
 const client = createDockerDesktopClient();
 
@@ -19,10 +18,21 @@ function useDockerDesktopClient() {
   return client;
 }
 
-export function App() {
+const NAVIGATION: Navigation = [
+  {
+    segment: 'queries',
+    title: 'SQL Queries',
+    icon: <OpenInNewIcon />,
+  },
+];
+
+const BRANDING: Branding = {
+  title: 'OrioleDB Management',
+};
+
+function QueryPage() {
   const [queryResult, setQueryResult] = React.useState<string>("");
   const [query, setQuery] = React.useState<string>("SELECT version();");
-  const ddClient = useDockerDesktopClient();
 
   const executeQuery = async () => {
     console.log("Executing query:", query);
@@ -54,63 +64,51 @@ export function App() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, px: 0, mx: 0 }}>
-      <AppBar position="static" color="primary">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            OrioleDB Management
+    <Box sx={{ p: 3 }}>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+        Manage your OrioleDB instance with this simple interface.
+      </Typography>
+
+      <Stack spacing={3}>
+        <Box>
+          <Typography variant="h6" gutterBottom>
+            Execute Query
           </Typography>
-          <Link
-            href="https://www.orioledb.com/docs"
-            target="_blank"
-            rel="noopener noreferrer"
-            color="inherit"
-            sx={{ display: "flex", alignItems: "center" }}
-          >
-            <IconButton color="inherit" size="small">
-              <OpenInNewIcon fontSize="small" />
-            </IconButton>
-            Docs
-          </Link>
-        </Toolbar>
-      </AppBar>
-
-      <Box>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Manage your OrioleDB instance with this simple interface.
-        </Typography>
-
-        <Stack spacing={3}>
-          <Box>
-            <Typography variant="h6" gutterBottom>
+          <Stack spacing={2}>
+            <TextField
+              label="SQL Query"
+              multiline
+              rows={3}
+              fullWidth
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Enter your SQL query here..."
+            />
+            <Button variant="contained" onClick={executeQuery}>
               Execute Query
-            </Typography>
-            <Stack spacing={2}>
-              <TextField
-                label="SQL Query"
-                multiline
-                rows={3}
-                fullWidth
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Enter your SQL query here..."
-              />
-              <Button variant="contained" onClick={executeQuery}>
-                Execute Query
-              </Button>
-              <TextField
-                label="Query Result"
-                multiline
-                rows={8}
-                fullWidth
-                value={queryResult}
-                disabled
-                variant="outlined"
-              />
-            </Stack>
-          </Box>
-        </Stack>
-      </Box>
+            </Button>
+            <TextField
+              label="Query Result"
+              multiline
+              rows={8}
+              fullWidth
+              value={queryResult}
+              disabled
+              variant="outlined"
+            />
+          </Stack>
+        </Box>
+      </Stack>
     </Box>
+  );
+}
+
+export function App() {
+  return (
+    <AppProvider navigation={NAVIGATION} branding={BRANDING}>
+      <DashboardLayout>
+        <QueryPage />
+      </DashboardLayout>
+    </AppProvider>
   );
 }
